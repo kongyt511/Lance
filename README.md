@@ -1,16 +1,14 @@
-[中文文档](./README_zh.md)
-
 <div align="center">
   <h3 style="font-family: 'Georgia', 'Times New Roman', serif; font-style: italic; font-size: 1.5em; margin: 20px 0 15px 0;">Lance: Unified Multimodal Models via Native Multi-Task Synergy</h3>
   <p style="font-size: 1.20em; font-weight: 500; color: #666; margin: 15px 0 1px 0;">
+    <strong>
     <a href="https://scholar.google.com.hk/citations?user=FXxoQlsAAAAJ&hl=zh-CN&oi=ao" style="text-decoration: none; color: inherit;">Fengyi Fu</a><sup>*</sup>, 
     <a href="https://corleone-huang.github.io/" style="text-decoration: none; color: inherit;">Mengqi Huang</a><sup>*,✉</sup>, 
     <a href="https://scholar.google.com.hk/citations?user=9ER6nVkAAAAJ&hl=zh-CN&oi=ao" style="text-decoration: none; color: inherit;">Shaojin Wu</a><sup>*</sup>, 
     Yunsheng Jiang<sup>*</sup>, 
     Yufei Huo, 
     <a href="https://guojianzhu.com/" style="text-decoration: none; color: inherit;">Jianzhu Guo</a><sup>✉,§</sup>
-  </p>
-  <p style="font-size: 1.0em; font-weight: 500; color: #666; margin: 0 0 8px 0;">
+    </strong><br>
     Hao Li, 
     Yinghang Song, 
     Fei Ding, 
@@ -26,10 +24,11 @@
     <sup>*</sup> Equal contribution &nbsp;&nbsp; <sup>✉</sup> Corresponding authors &nbsp;&nbsp; <sup>§</sup> Project Lead
   </p>
   <p style="margin: 20px 0;">
-    <a href="#" style="text-decoration: none; margin: 0 8px;"><img src="https://img.shields.io/badge/Website-Lance-blue?style=flat-square&logo=github" alt="Website"></a>
-    <a href="#" style="text-decoration: none; margin: 0 8px;"><img src="https://img.shields.io/badge/Paper-arXiv-red?style=flat-square&logo=arxiv" alt="arXiv"></a>
-    <a href="#" style="text-decoration: none; margin: 0 8px;"><img src="https://img.shields.io/badge/Model-HuggingFace-yellow?style=flat-square&logo=huggingface" alt="Model"></a>
+    <a href="https://lance-project.github.io/" style="text-decoration: none; margin: 0 8px;"><img src="https://img.shields.io/badge/Website-Lance-blue?style=flat-square&logo=github" alt="Website"></a>
+    <a href="https://lance-project.github.io/assets/lance.pdf" style="text-decoration: none; margin: 0 8px;"><img src="https://img.shields.io/badge/Paper-arXiv-red?style=flat-square&logo=arxiv" alt="arXiv"></a>
+    <a href="https://huggingface.co/bytedance-research/Lance" style="text-decoration: none; margin: 0 8px;"><img src="https://img.shields.io/badge/Model-HuggingFace-yellow?style=flat-square&logo=huggingface" alt="Model"></a>
   </p>
+  <h3 align="center">English | <a href="./README_zh.md"><ins>简体中文</ins></a></h3>
 </div>
 
 ## 🌟 Highlights
