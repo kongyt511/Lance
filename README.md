@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="assets/logo/lance-logo.webp" alt="Lance logo" width="360">
+  <img src="assets/logo/lance-logo.webp" alt="Lance logo" width="320">
 
   <h2 align="center">Lance: Unified Multimodal Modeling by Multi-Task Synergy</h2>
   <p>
