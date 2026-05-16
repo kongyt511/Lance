@@ -1,5 +1,5 @@
 <div align="center">
-  <h3 style="font-family: 'Georgia', 'Times New Roman', serif; font-style: italic; font-size: 1.5em; margin: 20px 0 15px 0;">Lance: Unified Multimodal Models via Native Multi-Task Synergy</h3>
+  <h1 align="center">Lance: Unified Multimodal Modeling by Multi-Task Synergy</h1>
   <p>
     <strong>
     <a href="https://scholar.google.com.hk/citations?user=FXxoQlsAAAAJ&hl=zh-CN&oi=ao" style="text-decoration: none; color: inherit;">Fengyi Fu</a><sup>*</sup>, 
