@@ -22,8 +22,8 @@
       "assets/image-understanding/cases/image-understanding-case-02.png",
       [
         "Look at the image carefully and answer the question.",
-        "Which country was Honduras' most important export partner in 2019?",
-        "El Salvador was the most important exporter in 2019, as he had a significant share in the United States."
+        "What percentage of respondents want better border security?",
+        "29%"
       ]
     ],
     "element_dtype_array": [

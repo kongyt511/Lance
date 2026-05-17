@@ -174,9 +174,9 @@ Lance is a lightweight native unified multimodal model that supports **image and
         <p><strong>Answer:</strong> Yes, the largest segment in the pie chart is the blue one, which is the most populous segment.</p>
       </td>
       <td align="left" valign="top" width="33%">
-        <img src="assets/image-understanding/cases/image-understanding-case-02.png" alt="Trade chart reasoning case" width="100%">
-        <p><strong>Question:</strong> Which country was Honduras' most important export partner in 2019?</p>
-        <p><strong>Answer:</strong> El Salvador was the most important exporter in 2019, as he had a significant share in the United States.</p>
+        <img src="assets/image-understanding/cases/image-understanding-case-02.png" alt="Survey chart about border security priorities" width="100%">
+        <p><strong>Question:</strong> What percentage of respondents want better border security?</p>
+        <p><strong>Answer:</strong> 29%</p>
       </td>
       <td align="left" valign="top" width="33%">
         <img src="assets/image-understanding/cases/image-understanding-case-03.png" alt="License plate recognition case" width="100%">
