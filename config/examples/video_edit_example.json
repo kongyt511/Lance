@@ -1,9 +1,9 @@
 {
   "0001": {
     "interleave_array": [
-      "change the color of the clouds to pink",
-      "config/examples/video_edit_examples/index000000_cond1.mp4",
-      "config/examples/video_edit_examples/index000000_cond1.mp4"
+      "Change the car's color to red and change the background to a snowy road.",
+      "config/examples/video_edit_examples/edit_source_car.mp4",
+      "config/examples/video_edit_examples/edit_source_car.mp4"
     ],
     "element_dtype_array": [
       "text",
@@ -18,9 +18,26 @@
   },
   "0002": {
     "interleave_array": [
-      "Change the gull into a majestic eagle",
-      "config/examples/video_edit_examples/index000001_cond1.mp4",
-      "config/examples/video_edit_examples/index000001_cond1.mp4"
+      "Add square black sunglasses and change the background to a fairytale castle by a lake.",
+      "config/examples/video_edit_examples/edit_source_woman.mp4",
+      "config/examples/video_edit_examples/edit_source_woman.mp4"
+    ],
+    "element_dtype_array": [
+      "text",
+      "video",
+      "video"
+    ],
+    "istarget_in_interleave": [
+      0,
+      0,
+      1
+    ]
+  },
+  "0003": {
+    "interleave_array": [
+      "Change the background to a waterfall valley with cliffs and replace the short bob with long wavy hair.",
+      "config/examples/video_edit_examples/edit_source_woman.mp4",
+      "config/examples/video_edit_examples/edit_source_woman.mp4"
     ],
     "element_dtype_array": [
       "text",
@@ -34,3 +51,4 @@
     ]
   }
 }
+
