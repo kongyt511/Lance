@@ -39,6 +39,8 @@
 - **3B 规模高效强大。** 仅使用 **3B active parameters**，Lance 即可在图像生成、图像编辑和视频生成等基准上取得强劲表现。
 - **从零训练。** Lance 采用分阶段多任务训练配方，在 **128 张 A100 GPU** 的预算内从零完成训练。
 
+我们正在持续更新和改进本仓库。如果你发现任何问题或有改进建议，欢迎提出 issue 或提交 pull request（PR）💖。
+
 <div align="center">
   <img src="assets/benchmarks/benchmark-overview.png" alt="Lance benchmark overview across image generation, image editing, video generation, and video understanding" width="980">
 </div>
