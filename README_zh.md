@@ -223,16 +223,7 @@ git clone https://github.com/bytedance-seed/Lance.git
 cd Lance
 ```
 
-#### 选项 1：自动安装
-
-```bash
-conda create -n Lance python=3.11 -y
-conda activate Lance
-bash ./setup_env.sh
-pip install flash-attn==2.8.3 --no-build-isolation
-```
-
-#### 选项 2：手动安装 （推荐）
+#### 配置环境
 
 ```bash
 conda create -n Lance python=3.11 -y
