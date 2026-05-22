@@ -272,8 +272,6 @@ snapshot_download(cache_dir=cache_dir,
 
 ### Inference
 
-We provide a unified command-line interface for all generation / editing / understanding tasks:
-
 #### Option 1: Configure and Run the Unified Script
 
 ```bash
@@ -285,8 +283,6 @@ bash inference_lance.sh
 - **Note:** For all tasks, we recommend following the `prompt` format used in the provided examples when writing input prompts, as this typically leads to better generation quality.
 
 #### Option 2: Configure and Run the Unified Script
-
-We provide task-specific one-click commands for different generation, editing, and understanding tasks.
 
 ##### Text-to-Video Generation
 
