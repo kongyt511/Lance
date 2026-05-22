@@ -51,7 +51,7 @@ We are actively updating and improving this repository. If you find any bugs or 
 <summary><strong>Show demo results</strong></summary>
 
 <div align="center">
-  <strong>🔥 For more results, visit our <a href="https://lance-project.github.io/">homepage</a> 🔥</strong>
+  <strong>🔥 We recommend visiting our <a href="https://lance-project.github.io/">homepage</a> for more visual results. 🔥</strong>
 </div>
 
 <h3 align="center">Text-to-Video</h3>

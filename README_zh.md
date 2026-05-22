@@ -51,7 +51,7 @@
 <summary><strong>展开查看演示结果</strong></summary>
 
 <div align="center">
-  <strong>🔥 更多结果请访问我们的 <a href="https://lance-project.github.io/">homepage</a> 🔥</strong>
+  <strong>🔥 建议浏览我们的 <a href="https://lance-project.github.io/">主页</a> 查看更多效果。🔥</strong>
 </div>
 
 <h3 align="center">文生视频</h3>
