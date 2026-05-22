@@ -223,7 +223,7 @@ git clone https://github.com/bytedance-seed/Lance.git
 cd Lance
 ```
 
-#### 配置环境
+然后，配置环境：
 
 ```bash
 conda create -n Lance python=3.11 -y
