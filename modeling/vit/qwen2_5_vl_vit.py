@@ -48,13 +48,17 @@ from transformers import Qwen2_5_VLPreTrainedModel
 from transformers.models.qwen2_5_vl.configuration_qwen2_5_vl import Qwen2_5_VLVisionConfig
 from transformers.utils import is_flash_attn_2_available
 from transformers.activations import ACT2FN
+from common.model.attention_backend import (
+    BACKEND_FLASH_ATTN,
+    get_attention_backend,
+    sdpa_attention,
+    varlen_attention,
+)
 
 if is_flash_attn_2_available():
-    from flash_attn import flash_attn_varlen_func
     from flash_attn.layers.rotary import apply_rotary_emb
 
 else:
-    flash_attn_varlen_func = None
     apply_rotary_emb = None
 
 def rotate_half(x):
@@ -77,7 +81,7 @@ def apply_rotary_pos_emb_vision(
     return q_embed, k_embed
 
 class Qwen2_5_VLVisionAttention(nn.Module):
-    def __init__(self, dim: int, num_heads: int = 16) -> None:
+    def __init__(self, dim: int, num_heads: int = 16, attention_backend: str = "sdpa") -> None:
         super().__init__()
         self.num_heads = num_heads
         self.head_dim = dim // num_heads
@@ -128,6 +132,11 @@ class Qwen2_5_VLVisionAttention(nn.Module):
 def apply_rotary_pos_emb_flashatt(
     q: torch.Tensor, k: torch.Tensor, cos: torch.Tensor, sin: torch.Tensor
 ) -> Tuple[torch.Tensor, torch.Tensor]:
+    if apply_rotary_emb is None:
+        raise RuntimeError(
+            "flash-attn rotary kernels are not available. Set --attention_backend cudnn_sdpa / sdpa "
+            "or install a compatible flash-attn build."
+        )
     cos = cos.chunk(2, dim=-1)[0].contiguous()
     sin = sin.chunk(2, dim=-1)[0].contiguous()
     q_embed = apply_rotary_emb(q.float(), cos, sin).type_as(q)
@@ -135,9 +144,10 @@ def apply_rotary_pos_emb_flashatt(
     return q_embed, k_embed
 
 class Qwen2_5_VLVisionFlashAttention2(nn.Module):
-    def __init__(self, dim: int, num_heads: int = 16) -> None:
+    def __init__(self, dim: int, num_heads: int = 16, attention_backend: str = BACKEND_FLASH_ATTN) -> None:
         super().__init__()
         self.num_heads = num_heads
+        self.attention_backend = attention_backend
         self.qkv = nn.Linear(dim, dim * 3, bias=True)
         self.proj = nn.Linear(dim, dim)
 
@@ -168,16 +178,26 @@ class Qwen2_5_VLVisionFlashAttention2(nn.Module):
         k = k.squeeze(0)
 
         max_seqlen = (cu_seqlens[1:] - cu_seqlens[:-1]).max().item()
-        attn_output = flash_attn_varlen_func(q, k, v, cu_seqlens, cu_seqlens, max_seqlen, max_seqlen).reshape(
+        attn_output = varlen_attention(
+            q,
+            k,
+            v,
+            cu_seqlens,
+            cu_seqlens,
+            max_seqlen,
+            max_seqlen,
+            backend=BACKEND_FLASH_ATTN,
+        ).reshape(
             seq_length, -1
         )
         attn_output = self.proj(attn_output)
         return attn_output
 
 class Qwen2_5_VLVisionSdpaAttention(nn.Module):
-    def __init__(self, dim: int, num_heads: int = 16) -> None:
+    def __init__(self, dim: int, num_heads: int = 16, attention_backend: str = "sdpa") -> None:
         super().__init__()
         self.num_heads = num_heads
+        self.attention_backend = attention_backend
         self.qkv = nn.Linear(dim, dim * 3, bias=True)
         self.proj = nn.Linear(dim, dim)
 
@@ -210,7 +230,7 @@ class Qwen2_5_VLVisionSdpaAttention(nn.Module):
         q = q.transpose(0, 1)
         k = k.transpose(0, 1)
         v = v.transpose(0, 1)
-        attn_output = F.scaled_dot_product_attention(q, k, v, attention_mask, dropout_p=0.0)
+        attn_output = sdpa_attention(q, k, v, attention_mask, backend=self.attention_backend)
         attn_output = attn_output.transpose(0, 1)
         attn_output = attn_output.reshape(seq_length, -1)
         attn_output = self.proj(attn_output)
@@ -296,7 +316,9 @@ class Qwen2_5_VLVisionBlock(nn.Module):
         self.norm1 = Qwen2RMSNorm(config.hidden_size, eps=1e-6)
         self.norm2 = Qwen2RMSNorm(config.hidden_size, eps=1e-6)
         self.attn = QWEN2_5_VL_VISION_ATTENTION_CLASSES[attn_implementation](
-            config.hidden_size, num_heads=config.num_heads
+            config.hidden_size,
+            num_heads=config.num_heads,
+            attention_backend=get_attention_backend(config, default=attn_implementation),
         )
         self.mlp = Qwen2_5_VLMLP(config, bias=True)
 

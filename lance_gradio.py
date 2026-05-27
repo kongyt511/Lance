@@ -76,6 +76,7 @@ class LanceT2VV2TPipeline:
             max_num_frames=MAX_VIDEO_NUM_FRAMES,
             max_latent_size=64,
             latent_patch_size=[1, 1, 1],
+            attention_backend=DEFAULT_ATTENTION_BACKEND,
         )
 
     def _build_base_inference_args(self) -> InferenceArguments:
@@ -146,6 +147,9 @@ class LanceT2VV2TPipeline:
             llm_config.tie_word_embeddings = model_args.tie_word_embeddings
             llm_config.freeze_und = inference_args.freeze_und
             llm_config.apply_qwen_2_5_vl_pos_emb = inference_args.apply_qwen_2_5_vl_pos_emb
+            llm_config.attention_backend = model_args.attention_backend
+            if model_args.attention_backend in {"auto", "cudnn_sdpa", "sdpa", "flash_sdpa", "efficient_sdpa", "math_sdpa"}:
+                llm_config._attn_implementation = "sdpa"
 
             stage_start = time.perf_counter()
             print(f"[startup][gpu:{self.device}] Initializing LLM weights: {model_args.model_path}", flush=True)
@@ -160,6 +164,9 @@ class LanceT2VV2TPipeline:
                 stage_start = time.perf_counter()
                 print(f"[startup][gpu:{self.device}] Loading VIT config: {model_args.vit_path}", flush=True)
                 vit_config = Qwen2_5_VLVisionConfig.from_pretrained(model_args.vit_path)
+                vit_config.attention_backend = model_args.attention_backend
+                if model_args.attention_backend in {"auto", "cudnn_sdpa", "sdpa", "flash_sdpa", "efficient_sdpa", "math_sdpa"}:
+                    vit_config._attn_implementation = "sdpa"
                 self._log_stage("VIT config load", stage_start)
 
                 stage_start = time.perf_counter()

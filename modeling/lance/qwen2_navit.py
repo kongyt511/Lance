@@ -22,12 +22,10 @@ from einops import rearrange
 
 import torch
 from torch import nn
-from torch.nn.attention import SDPBackend, sdpa_kernel
 from torch.nn.attention.flex_attention import flex_attention
-from torch.nn.functional import scaled_dot_product_attention
 from transformers.utils import ModelOutput
 
-from flash_attn import flash_attn_varlen_func
+from common.model.attention_backend import get_attention_backend, sdpa_attention, varlen_attention
 from modeling.qwen2.modeling_qwen2 import (
     Qwen2Attention,
     Qwen2MLP,
@@ -79,6 +77,7 @@ class PackedAttention(Qwen2Attention):
     # TODO: 暂未使用，qknorm未更新相关逻辑
     def __init__(self, config, layer_idx: Optional[int] = None):
         super().__init__(config, layer_idx)
+        self.attention_backend = get_attention_backend(config)
         if self.config.qk_norm:
             self.q_norm = Qwen2RMSNorm(self.head_dim, eps=config.rms_norm_eps)
             self.k_norm = Qwen2RMSNorm(self.head_dim, eps=config.rms_norm_eps)
@@ -130,13 +129,13 @@ class PackedAttention(Qwen2Attention):
             unpacked_value_states = packed_value_states.transpose(0, 1).split(sample_lens, dim=1)
             upacked_attn_output = []
             for query_states, key_states, value_states, attention_mask_per_sample in zip(unpacked_query_states, unpacked_key_states, unpacked_value_states, attention_mask):
-                with sdpa_kernel(backends=[SDPBackend.EFFICIENT_ATTENTION]):
-                    attn_output = scaled_dot_product_attention(
-                        query_states.to(torch.bfloat16).unsqueeze(0),
-                        key_states.to(torch.bfloat16).unsqueeze(0),
-                        value_states.to(torch.bfloat16).unsqueeze(0),
-                        attention_mask_per_sample.to(torch.bfloat16).unsqueeze(0),
-                    )
+                attn_output = sdpa_attention(
+                    query_states.to(torch.bfloat16).unsqueeze(0),
+                    key_states.to(torch.bfloat16).unsqueeze(0),
+                    value_states.to(torch.bfloat16).unsqueeze(0),
+                    attention_mask_per_sample.to(torch.bfloat16).unsqueeze(0),
+                    backend=self.attention_backend,
+                )
                 upacked_attn_output.append(attn_output.squeeze(0))
             packed_attn_output = torch.cat(upacked_attn_output, dim=1)
         else:
@@ -206,7 +205,7 @@ class PackedAttention(Qwen2Attention):
         cu_seqlens_q = torch.nn.functional.pad(torch.cumsum(query_lens, dim=0), (1, 0))
         cu_seqlens_k = torch.nn.functional.pad(torch.cumsum(key_values_lens, dim=0), (1, 0))
 
-        packed_attn_output = flash_attn_varlen_func(
+        packed_attn_output = varlen_attention(
             q=packed_query_states,
             k=merged_key_states,
             v=merged_value_states,
@@ -215,6 +214,7 @@ class PackedAttention(Qwen2Attention):
             max_seqlen_q=max(query_lens).item(),
             max_seqlen_k=max(key_values_lens).item(),
             causal=is_causal,
+            backend=self.attention_backend,
         )
         packed_attn_output = packed_attn_output.reshape(-1, self.hidden_size)
         packed_attn_output = self.o_proj(packed_attn_output)
@@ -229,6 +229,7 @@ class PackedAttention(Qwen2Attention):
 class PackedAttentionMoT(Qwen2Attention):
     def __init__(self, config, layer_idx: Optional[int] = None):
         super().__init__(config, layer_idx)
+        self.attention_backend = get_attention_backend(config)
         if self.config.qk_norm_und or self.config.qk_norm_gen:
             # NOTE: 拆开初始化
             # 理解
@@ -335,13 +336,13 @@ class PackedAttentionMoT(Qwen2Attention):
             unpacked_value_states = packed_value_states.transpose(0, 1).split(sample_lens, dim=1)
             upacked_attn_output = []
             for query_states, key_states, value_states, attention_mask_per_sample in zip(unpacked_query_states, unpacked_key_states, unpacked_value_states, attention_mask):
-                with sdpa_kernel(backends=[SDPBackend.EFFICIENT_ATTENTION]):
-                    attn_output = scaled_dot_product_attention(
-                        query_states.to(torch.bfloat16).unsqueeze(0),
-                        key_states.to(torch.bfloat16).unsqueeze(0),
-                        value_states.to(torch.bfloat16).unsqueeze(0),
-                        attention_mask_per_sample.to(torch.bfloat16).unsqueeze(0),
-                    )
+                attn_output = sdpa_attention(
+                    query_states.to(torch.bfloat16).unsqueeze(0),
+                    key_states.to(torch.bfloat16).unsqueeze(0),
+                    value_states.to(torch.bfloat16).unsqueeze(0),
+                    attention_mask_per_sample.to(torch.bfloat16).unsqueeze(0),
+                    backend=self.attention_backend,
+                )
                 upacked_attn_output.append(attn_output.squeeze(0))
             packed_attn_output = torch.cat(upacked_attn_output, dim=1)
 
@@ -460,7 +461,7 @@ class PackedAttentionMoT(Qwen2Attention):
         cu_seqlens_q = torch.nn.functional.pad(torch.cumsum(query_lens, dim=0), (1, 0))
         cu_seqlens_k = torch.nn.functional.pad(torch.cumsum(key_values_lens, dim=0), (1, 0))
 
-        packed_attn_output = flash_attn_varlen_func(
+        packed_attn_output = varlen_attention(
             q=packed_query_states,
             k=merged_key_states,
             v=merged_value_states,
@@ -469,6 +470,7 @@ class PackedAttentionMoT(Qwen2Attention):
             max_seqlen_q=max(query_lens).item(),
             max_seqlen_k=max(key_values_lens).item(),
             causal=is_causal,
+            backend=self.attention_backend,
         )
         packed_attn_output = packed_attn_output.reshape(-1, self.hidden_size)
         if mode == "und":

@@ -442,6 +442,9 @@ def main():
     llm_config.tie_word_embeddings = model_args.tie_word_embeddings
     llm_config.freeze_und = training_args.freeze_und
     llm_config.apply_qwen_2_5_vl_pos_emb = training_args.apply_qwen_2_5_vl_pos_emb
+    llm_config.attention_backend = model_args.attention_backend
+    if model_args.attention_backend in {"auto", "cudnn_sdpa", "sdpa", "flash_sdpa", "efficient_sdpa", "math_sdpa"}:
+        llm_config._attn_implementation = "sdpa"
 
     stage_start = time.perf_counter()
     log_rank0(f"[startup] Initializing LLM weights: {model_args.model_path}")
@@ -453,6 +456,9 @@ def main():
             stage_start = time.perf_counter()
             log_rank0(f"[startup] Loading VIT config: {model_args.vit_path}")
             vit_config = Qwen2_5_VLVisionConfig.from_pretrained(model_args.vit_path)
+            vit_config.attention_backend = model_args.attention_backend
+            if model_args.attention_backend in {"auto", "cudnn_sdpa", "sdpa", "flash_sdpa", "efficient_sdpa", "math_sdpa"}:
+                vit_config._attn_implementation = "sdpa"
             log_stage("VIT config load", stage_start)
 
             stage_start = time.perf_counter()

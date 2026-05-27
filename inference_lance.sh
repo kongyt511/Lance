@@ -14,6 +14,7 @@ VALIDATION_TIMESTEP_SHIFT=${VALIDATION_TIMESTEP_SHIFT:-3.5}
 VALIDATION_DATA_SEED=${VALIDATION_DATA_SEED:-42}
 CFG_TEXT_SCALE=${CFG_TEXT_SCALE:-4.0}
 USE_KVCACHE=${USE_KVCACHE:-true}
+ATTENTION_BACKEND=${ATTENTION_BACKEND:-auto} # auto | flash_attn | cudnn_sdpa | sdpa | flash_sdpa | efficient_sdpa | math_sdpa
 
 NUM_FRAMES=${NUM_FRAMES:-50}             # max: 121 frames, unused for image tasks
 VIDEO_HEIGHT=${VIDEO_HEIGHT:-768}        # unused for editing
@@ -35,6 +36,7 @@ while [[ $# -gt 0 ]]; do
         --VALIDATION_DATA_SEED) VALIDATION_DATA_SEED="$2"; shift 2 ;;
         --CFG_TEXT_SCALE) CFG_TEXT_SCALE="$2"; shift 2 ;;
         --USE_KVCACHE) USE_KVCACHE="$2"; shift 2 ;;
+        --ATTENTION_BACKEND) ATTENTION_BACKEND="$2"; shift 2 ;;
 
         --NUM_FRAMES) NUM_FRAMES="$2"; shift 2 ;;
         --VIDEO_HEIGHT) VIDEO_HEIGHT="$2"; shift 2 ;;
@@ -48,6 +50,7 @@ while [[ $# -gt 0 ]]; do
             echo ""
             echo "Example:"
             echo "  bash inference_lance_my.sh --TASK_NAME t2i --MODEL_PATH downloads/Lance_3B --RESOLUTION image_768res"
+            echo "  bash inference_lance_my.sh --ATTENTION_BACKEND cudnn_sdpa"
             exit 0
             ;;
 
@@ -98,6 +101,7 @@ echo "  - validation_data_seed: ${VALIDATION_DATA_SEED}"
 echo "  - cfg_text_scale: ${CFG_TEXT_SCALE}"
 echo "  - num_frames: ${NUM_FRAMES}"
 echo "  - use_KVcache: ${USE_KVCACHE}"
+echo "  - attention_backend: ${ATTENTION_BACKEND}"
 echo "================================================"
 echo ""
 
@@ -137,7 +141,8 @@ accelerate launch \
     --resolution            "$RESOLUTION" \
     --text_template         "$TEXT_TEMPLATE" \
     --cfg_text_scale        $CFG_TEXT_SCALE \
-    --use_KVcache           "$USE_KVCACHE"
+    --use_KVcache           "$USE_KVCACHE" \
+    --attention_backend     "$ATTENTION_BACKEND"
 
 echo ""
 echo "================================================"

@@ -162,6 +162,7 @@ class ModelArguments:
     interpolate_pos:            bool = False
     vit_select_layer:           int = -2
     vit_rope:                   bool = False
+    attention_backend:          str = "auto"  # auto | flash_attn | cudnn_sdpa | sdpa | flash_sdpa | efficient_sdpa | math_sdpa
 
     text_cond_dropout_prob:     float = 0.1
     vae_cond_dropout_prob:      float = 0.3

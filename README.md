@@ -157,6 +157,14 @@ pip install -r requirements.txt
 pip install flash-attn==2.8.3 --no-build-isolation
 ```
 
+By default, inference uses `--ATTENTION_BACKEND auto`: it uses `flash-attn` when available, otherwise tries cuDNN SDPA, then falls back to PyTorch's default SDPA selection if cuDNN does not support the current input shape. You can also force a backend explicitly:
+
+```bash
+bash inference_lance.sh --ATTENTION_BACKEND cudnn_sdpa
+```
+
+Supported values are `auto` (default), `flash_attn`, `cudnn_sdpa`, `sdpa`, `flash_sdpa`, `efficient_sdpa`, and `math_sdpa`.
+
 > **Note:** If installing `flash-attn` from source fails, you can install a prebuilt wheel instead. The wheelhouse below is from a third-party repository and is provided for **reference only**; please verify that any wheel you install matches your Python, PyTorch and CUDA versions.
 
 > ```bash
