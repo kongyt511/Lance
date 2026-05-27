@@ -1,4 +1,4 @@
-FROM nvidia/cuda:12.6.3-cudnn-devel-ubuntu22.04
+FROM nvidia/cuda:12.8.1-cudnn-devel-ubuntu22.04
 
 ENV DEBIAN_FRONTEND=noninteractive \
     PYTHONUNBUFFERED=1 \
@@ -31,9 +31,8 @@ RUN python3 -m pip install \
         torch==2.8.0 \
         torchvision==0.23.0 \
         torchaudio==2.8.0 \
-        --index-url https://download.pytorch.org/whl/cu126 \
-    && python3 -m pip install -r requirements.txt \
-    && python3 -m pip install flash-attn==2.8.3 --no-build-isolation
+        --index-url https://download.pytorch.org/whl/cu128 \
+    && python3 -m pip install -r requirements.txt
 
 COPY . .
 
