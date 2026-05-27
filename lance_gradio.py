@@ -32,6 +32,7 @@ from inference_lance import (
     clean_memory,
     init_from_model_path_if_needed,
     save_prompt_results,
+    set_attn_implementation,
     validate_on_fixed_batch,
 )
 from modeling.lance import Lance, LanceConfig, Qwen2ForCausalLM
@@ -149,7 +150,7 @@ class LanceT2VV2TPipeline:
             llm_config.apply_qwen_2_5_vl_pos_emb = inference_args.apply_qwen_2_5_vl_pos_emb
             llm_config.attention_backend = model_args.attention_backend
             if model_args.attention_backend in {"auto", "cudnn_sdpa", "sdpa", "flash_sdpa", "efficient_sdpa", "math_sdpa"}:
-                llm_config._attn_implementation = "eager"
+                set_attn_implementation(llm_config, "eager")
 
             stage_start = time.perf_counter()
             print(f"[startup][gpu:{self.device}] Initializing LLM weights: {model_args.model_path}", flush=True)
@@ -166,7 +167,7 @@ class LanceT2VV2TPipeline:
                 vit_config = Qwen2_5_VLVisionConfig.from_pretrained(model_args.vit_path)
                 vit_config.attention_backend = model_args.attention_backend
                 if model_args.attention_backend in {"auto", "cudnn_sdpa", "sdpa", "flash_sdpa", "efficient_sdpa", "math_sdpa"}:
-                    vit_config._attn_implementation = "eager"
+                    set_attn_implementation(vit_config, "eager")
                 self._log_stage("VIT config load", stage_start)
 
                 stage_start = time.perf_counter()

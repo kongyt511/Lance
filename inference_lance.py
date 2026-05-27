@@ -152,6 +152,13 @@ def clean_memory(*objects):
         torch.cuda.empty_cache()
 
 
+def set_attn_implementation(config, attn_implementation: str) -> None:
+    """Set both public and internal Transformers attention implementation flags."""
+    config._attn_implementation = attn_implementation
+    if hasattr(config, "_attn_implementation_internal"):
+        config._attn_implementation_internal = attn_implementation
+
+
 def apply_inference_defaults(
     model_args: ModelArguments,
     data_args: DataArguments,
@@ -444,7 +451,7 @@ def main():
     llm_config.apply_qwen_2_5_vl_pos_emb = training_args.apply_qwen_2_5_vl_pos_emb
     llm_config.attention_backend = model_args.attention_backend
     if model_args.attention_backend in {"auto", "cudnn_sdpa", "sdpa", "flash_sdpa", "efficient_sdpa", "math_sdpa"}:
-        llm_config._attn_implementation = "eager"
+        set_attn_implementation(llm_config, "eager")
 
     stage_start = time.perf_counter()
     log_rank0(f"[startup] Initializing LLM weights: {model_args.model_path}")
@@ -458,7 +465,7 @@ def main():
             vit_config = Qwen2_5_VLVisionConfig.from_pretrained(model_args.vit_path)
             vit_config.attention_backend = model_args.attention_backend
             if model_args.attention_backend in {"auto", "cudnn_sdpa", "sdpa", "flash_sdpa", "efficient_sdpa", "math_sdpa"}:
-                vit_config._attn_implementation = "sdpa"
+                set_attn_implementation(vit_config, "sdpa")
             log_stage("VIT config load", stage_start)
 
             stage_start = time.perf_counter()
